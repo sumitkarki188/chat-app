@@ -5,41 +5,32 @@ import "../style.css";
 const UserAuth = () => {
   const [mode, setMode] = useState("login");
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
-      const res = await fetch("http://localhost/chatapp/login.php", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
       });
-
+      
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-
+      
       const data = await res.json();
       console.log("Login response:", data);
       
       if (data.success) {
-        localStorage.setItem('user', data.user);
+        localStorage.setItem('user', data.user || formData.username);
         navigate("/chat");
       } else {
         alert(data.message || "Login failed");
@@ -55,20 +46,17 @@ const UserAuth = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
     try {
-      const res = await fetch("http://localhost/chatapp/signup.php", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/signup.php`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
       });
-
+      
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-
+      
       const data = await res.json();
       console.log("Signup response:", data);
       
@@ -88,33 +76,9 @@ const UserAuth = () => {
   };
 
   return (
-    <div className="login_container">
-      <div className="login_title">
-        <h1>Chat Application</h1>
-      </div>
-      
-      <div className="auth_toggle">
-        <button 
-          className={`auth_btn ${mode === "login" ? "active" : ""}`}
-          onClick={() => {
-            setMode("login");
-            setFormData({ username: "", password: "" });
-          }}
-        >
-          Login
-        </button>
-        <button 
-          className={`auth_btn ${mode === "signup" ? "active" : ""}`}
-          onClick={() => {
-            setMode("signup");
-            setFormData({ username: "", password: "" });
-          }}
-        >
-          Sign Up
-        </button>
-      </div>
-      
-      <form className="login_form" onSubmit={mode === "login" ? handleLogin : handleSignup}>
+    <div className="auth-container">
+      <h2>{mode === "login" ? "Login" : "Sign Up"}</h2>
+      <form onSubmit={mode === "login" ? handleLogin : handleSignup}>
         <input
           type="text"
           name="username"
@@ -122,8 +86,8 @@ const UserAuth = () => {
           value={formData.username}
           onChange={handleChange}
           required
+          disabled={loading}
         />
-        
         <input
           type="password"
           name="password"
@@ -131,12 +95,22 @@ const UserAuth = () => {
           value={formData.password}
           onChange={handleChange}
           required
+          disabled={loading}
         />
-        
         <button type="submit" disabled={loading}>
-          {loading ? "Processing..." : (mode === "login" ? "Login" : "Sign Up")}
+          {loading ? "Please wait..." : mode === "login" ? "Login" : "Sign Up"}
         </button>
       </form>
+      <p>
+        {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+        <button 
+          onClick={() => setMode(mode === "login" ? "signup" : "login")}
+          disabled={loading}
+          className="link-button"
+        >
+          {mode === "login" ? "Sign Up" : "Login"}
+        </button>
+      </p>
     </div>
   );
 };
