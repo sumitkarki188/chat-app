@@ -1,0 +1,13 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "install-frontend": "cd frontend && npm install",
+    "install-backend": "cd backend && npm install",
+    "dev-frontend": "cd frontend && npm run dev",
+    "dev-backend": "cd backend && npm run dev"
+  },
+  "devDependencies": {},
+  "workspaces": ["frontend", "backend"]
+}
