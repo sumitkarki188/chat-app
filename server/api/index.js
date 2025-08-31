@@ -8,16 +8,21 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://*.vercel.app"],
+    origin: ["http://localhost:5173", "https://*.vercel.app", "https://*.render.com"],
     methods: ["GET", "POST"],
     credentials: true
   }
 });
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://*.vercel.app"],
+  origin: ["http://localhost:5173", "https://*.vercel.app", "https://*.render.com"],
   credentials: true
 }));
+
+// Add a basic route for health check
+app.get('/', (req, res) => {
+  res.send('Chat server is running!');
+});
 
 let chatMessages = [];
 const connectedUsers = new Map();
@@ -66,4 +71,11 @@ io.on('connection', (socket) => {
   });
 });
 
+// CRITICAL: Start the server
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Export for testing (optional)
 module.exports = server;
