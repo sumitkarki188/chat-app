@@ -4,6 +4,7 @@
   "main": "api/index.js",
   "scripts": {
     "start": "node server/api/index.js",
+    "build": "cd frontend && npm install && npm run build",
     "dev": "nodemon api/index.js"
   },
   "dependencies": {
